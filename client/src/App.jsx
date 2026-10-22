@@ -1,6 +1,10 @@
+import { useState } from "react";
 import "./App.css";
 
 function App() {
+  const [error, setError] = useState("");
+  const [analysis, setAnalysis] = useState(true);
+
   return (
     <>
       <main className="app">
@@ -42,8 +46,77 @@ function App() {
             Analyze Resume
           </button>
         </form>
+
+        {error && (
+          <div className="error" role="alert">
+            {error}
+          </div>
+        )}
+
+        {analysis && (
+          <section className="results">
+            <h2>Analysis Results</h2>
+
+            <div className="score-card">
+              <span>Estimated job match</span>
+              <strong>{analysis.match_score}%</strong>
+              <div
+                className="progress"
+                role="progressbar"
+                aria-valuenow={analysis.match_score}
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-label="Estimated job match"
+              >
+                <div
+                  className="progress-fill"
+                  style={{ width: `${analysis.match_score}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="result-grid">
+              <ResultList
+                title="Matching Skills"
+                items={analysis.matching_skills}
+              />
+              <ResultList
+                title="Missing or Unverified Skills"
+                items={analysis.missing_skills}
+              />
+              <ResultList title="Resume Strengths" items={analysis.strengths} />
+              <ResultList
+                title="Improvement Suggestions"
+                items={analysis.suggestions}
+              />
+            </div>
+
+            <p className="disclaimer">
+              AI-generated estimates are not hiring decisions. Review all
+              findings for accuracy.
+            </p>
+          </section>
+        )}
       </main>
     </>
+  );
+}
+
+function ResultList({ title, items }) {
+  return (
+    <article className="result-card">
+      <h3>{title}</h3>
+
+      {items ? (
+        <ul>
+          {items.map((item, index) => (
+            <li key={`${item}-${index}`}>{item}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>No items returned.</p>
+      )}
+    </article>
   );
 }
 

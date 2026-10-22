@@ -1,82 +1,162 @@
-*{
-    box-sizing: border-box;
+
+* {
+  box-sizing: border-box;
 }
 
-body{
-    margin: 0;
-    background: #f4f6fb;
-    color: #1e293b;
-    font-family: Inter, system-ui, Arial, sans-serif;
-}
-button,textarea{
-    font: inherit;
+body {
+  margin: 0;
+  background: #f4f6fb;
+  color: #1e293b;
+  font-family: Inter, system-ui, Arial, sans-serif;
 }
 
-.app{
-    width: min(1100px,92%);
-    margin: 0 auto;
-    padding: 48px 0;
+button,
+textarea {
+  font: inherit;
 }
-.hero{
-    text-align: center;
-    margin-bottom: 36px;
+
+.app {
+  width: min(1100px, 92%);
+  margin: 0 auto;
+  padding: 48px 0;
 }
-.eyebrow{
-    color: #f446e5;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 2px;
+
+.hero {
+  text-align: center;
+  margin-bottom: 36px;
 }
-.hero h1{
-    margin: 12px 0;
-    font-size: clamp(32px, 5vw, 48px);
+
+.eyebrow {
+  color: #4f46e5;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
 }
+
+.hero h1 {
+  margin: 12px 0;
+  font-size: clamp(32px, 5vw, 48px);
+}
+
 .hero p,
-.panel p{
-    color: #64748b;
-    line-height: 1.6;
+.panel p {
+  color: #64748b;
+  line-height: 1.6;
 }
 
-/* Form */
-.input-grid{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
 }
-.panel{
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    padding: 22px;
+
+.panel,
+.result-card,
+.score-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 22px;
 }
-.panel label{
-    font-size: 18px;
-    font-weight: 700;
+
+.panel label {
+  font-size: 18px;
+  font-weight: 700;
 }
-.panel textarea{
-    display: block;
-    width: 100%;
-    resize: vertical;
-    min-height: 240px;
-    padding: 14px;
-    border:1px solid #cdd5e1;
-    border-radius: 10px;
-    outline-color: #6366f1;
-    line-height: 1.6;
+
+.panel textarea {
+  display: block;
+  width: 100%;
+  resize: vertical;
+  min-height: 240px;
+  padding: 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  outline-color: #6366f1;
+  line-height: 1.6;
 }
-.panel small{
-    display: block;
-    color: #64748b;
-    margin-top: 8px;
-    text-align: right;
+
+.panel small {
+  display: block;
+  color: #64748b;
+  margin-top: 8px;
+  text-align: right;
 }
-.analyze-button{
-    grid-column: 1 / -1;
-    border: 0;
-    border-radius: 10px;
-    padding: 16px;
-    background:#4f46e5;
-    color: white;
-    font-weight: 700;
-    cursor: pointer;
+
+.analyze-button {
+  grid-column: 1 / -1;
+  border: 0;
+  border-radius: 10px;
+  padding: 16px;
+  background: #4f46e5;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
 }
+
+.analyze-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.error {
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.results {
+  margin-top: 36px;
+}
+
+.score-card {
+  margin-bottom: 20px;
+}
+
+.score-card span,
+.score-card strong {
+  display: block;
+}
+
+.score-card strong {
+  font-size: 42px;
+  margin: 10px 0;
+}
+
+.progress {
+  height: 10px;
+  overflow: hidden;
+  background: #e2e8f0;
+  border-radius: 20px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #4f46e5;
+  transition: width 250ms ease;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.result-card h3 {
+  margin-top: 0;
+}
+
+.result-card li {
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+.disclaimer {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 20px;
+}
+
