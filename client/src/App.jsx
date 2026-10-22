@@ -2,8 +2,28 @@ import { useState } from "react";
 import "./App.css";
 
 function App() {
+
+  const [resume,setResume]=useState("");
+  const [jobDescription,setJobDescription]=useState("");
   const [error, setError] = useState("");
-  const [analysis, setAnalysis] = useState(true);
+  const [loading,setLoading]=useState(false);
+  const [analysis, setAnalysis] = useState(null);
+
+  async function handleAnalyzer(event){
+    event.preventDefault();
+
+    setError("");
+    setAnalysis(null);
+
+    if (!resume.trim() || !jobDescription.trim()) {
+      setError("Please enter both your resume and the job description.");
+      return;
+    }
+
+    setLoading(true);
+
+    
+  }
 
   return (
     <>
@@ -17,13 +37,15 @@ function App() {
           </p>
         </header>
 
-        <form className="input-grid">
+        <form className="input-grid" onSubmit={handleAnalyzer}>
           <section className="panel">
             <label htmlFor="resume">Your resume</label>
             <p>Paste your resume text below.</p>
             <textarea
               id="resume"
               placeholder="Education,skills,projects,experience..."
+              value={resume}
+              onChange={(e)=>setResume(e.target.value)}
               maxLength={15000}
               rows={12}
             />
@@ -36,14 +58,16 @@ function App() {
             <textarea
               id="job"
               placeholder="Responsibilities, required skills..."
+              value={jobDescription}
+              onChange={(e)=>setJobDescription(e.target.value)}
               maxLength={10000}
               rows={12}
             />
             <small>/10000 characters</small>
           </section>
 
-          <button className="analyze-button" type="submit">
-            Analyze Resume
+          <button className="analyze-button" type="submit" disabled={loading}>
+            {loading ? "Analyzing Resume..." : "Analyze Resume"}
           </button>
         </form>
 
