@@ -2,14 +2,13 @@ import { useState } from "react";
 import "./App.css";
 
 function App() {
-
-  const [resume,setResume]=useState("");
-  const [jobDescription,setJobDescription]=useState("");
+  const [resume, setResume] = useState("");
+  const [jobDescription, setJobDescription] = useState("");
   const [error, setError] = useState("");
-  const [loading,setLoading]=useState(false);
+  const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState(null);
 
-  async function handleAnalyzer(event){
+  async function handleAnalyzer(event) {
     event.preventDefault();
 
     setError("");
@@ -22,7 +21,34 @@ function App() {
 
     setLoading(true);
 
-    
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/resume/analyze`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            resume,
+            jobDescription,
+          }),
+        },
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Resume analysis failed.");
+      }
+
+      setAnalysis(data.analysis);
+    } catch (error) {
+      console.error("Frontend API Error:", error);
+      setError(error.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -45,11 +71,11 @@ function App() {
               id="resume"
               placeholder="Education,skills,projects,experience..."
               value={resume}
-              onChange={(e)=>setResume(e.target.value)}
+              onChange={(e) => setResume(e.target.value)}
               maxLength={15000}
               rows={12}
             />
-            <small>/15000 characters</small>
+            <small>{resume.length}/15000 characters</small>
           </section>
 
           <section className="panel">
@@ -59,11 +85,11 @@ function App() {
               id="job"
               placeholder="Responsibilities, required skills..."
               value={jobDescription}
-              onChange={(e)=>setJobDescription(e.target.value)}
+              onChange={(e) => setJobDescription(e.target.value)}
               maxLength={10000}
               rows={12}
             />
-            <small>/10000 characters</small>
+            <small>{jobDescription.length}/10000 characters</small>
           </section>
 
           <button className="analyze-button" type="submit" disabled={loading}>
@@ -116,8 +142,14 @@ function App() {
             </div>
 
             <p className="disclaimer">
-              AI-generated estimates are not hiring decisions. Review all
-              findings for accuracy.
+              Disclaimer: This Resume Analyzer is an independent demo project
+              developed by Sourabh Chalke. It is designed for educational and
+              portfolio purposes to demonstrate my skills in React.js, Node.js,
+              Express.js, MongoDB, and Google Gemini AI integration. Resumes and
+              personal information provided by users are used solely for
+              generating AI-based analysis. AI-generated results are estimates
+              and do not represent actual hiring decisions. Users should verify
+              all generated recommendations for accuracy.
             </p>
           </section>
         )}
