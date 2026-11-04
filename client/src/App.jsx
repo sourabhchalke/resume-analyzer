@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import "./App.css";
 
@@ -15,7 +16,9 @@ function App() {
     setAnalysis(null);
 
     if (!resume.trim() || !jobDescription.trim()) {
-      setError("Please enter both your resume and the job description.");
+      setError(
+        "Please enter both your resume and the job description."
+      );
       return;
     }
 
@@ -33,13 +36,21 @@ function App() {
             resume,
             jobDescription,
           }),
-        },
+        }
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Resume analysis failed.");
+        throw new Error(
+          data.message || "Resume analysis failed."
+        );
+      }
+
+      if (!data.analysis) {
+        throw new Error(
+          "The server returned no analysis. Please try again."
+        );
       }
 
       setAnalysis(data.analysis);
@@ -51,126 +62,193 @@ function App() {
     }
   }
 
+  const matchScore = Number(analysis?.match_score);
+  const safeScore = Number.isFinite(matchScore)
+    ? Math.max(0, Math.min(100, matchScore))
+    : 0;
+
   return (
-    <>
-      <main className="app">
-        <header className="hero">
-          <span className="eyebrow">AI-POWERED CAREER TOOL</span>
-          <h1>Resume Analyzer</h1>
+    <main className="app">
+      <header className="hero">
+        <span className="eyebrow">
+          AI-POWERED CAREER TOOL
+        </span>
+
+        <h1>Resume Analyzer</h1>
+
+        <p>
+          Turn your next job application into a smarter move.
+          Compare your resume with a job description and discover
+          the skills you should highlight or develop.
+        </p>
+      </header>
+
+      <form className="input-grid" onSubmit={handleAnalyzer}>
+        <section className="panel">
+          <label htmlFor="resume">
+            Your Resume
+          </label>
+
           <p>
-            Compare your resume with a job description and discover skills to
-            highlight or develop.
+            Start with your experience, education, skills, and
+            projects.
           </p>
-        </header>
 
-        <form className="input-grid" onSubmit={handleAnalyzer}>
-          <section className="panel">
-            <label htmlFor="resume">Your resume</label>
-            <p>Paste your resume text below.</p>
-            <textarea
-              id="resume"
-              placeholder="Education,skills,projects,experience..."
-              value={resume}
-              onChange={(e) => setResume(e.target.value)}
-              maxLength={15000}
-              rows={12}
-            />
-            <small>{resume.length}/15000 characters</small>
-          </section>
+          <textarea
+            id="resume"
+            name="resume"
+            placeholder="Paste your resume here..."
+            value={resume}
+            onChange={(e) => setResume(e.target.value)}
+            maxLength={15000}
+            rows={12}
+            required
+            aria-describedby="resume-count"
+          />
 
-          <section className="panel">
-            <label htmlFor="job">Job Description</label>
-            <p>Paste the requirements for your target role.</p>
-            <textarea
-              id="job"
-              placeholder="Responsibilities, required skills..."
-              value={jobDescription}
-              onChange={(e) => setJobDescription(e.target.value)}
-              maxLength={10000}
-              rows={12}
-            />
-            <small>{jobDescription.length}/10000 characters</small>
-          </section>
+          <small id="resume-count">
+            {resume.length.toLocaleString()}/15,000 characters
+          </small>
+        </section>
 
-          <button className="analyze-button" type="submit" disabled={loading}>
-            {loading ? "Analyzing Resume..." : "Analyze Resume"}
-          </button>
-        </form>
+        <section className="panel">
+          <label htmlFor="job">
+            Target Job Description
+          </label>
 
-        {error && (
-          <div className="error" role="alert">
-            {error}
-          </div>
-        )}
+          <p>
+            Add the role requirements to identify relevant
+            skills and potential gaps.
+          </p>
 
-        {analysis && (
-          <section className="results">
-            <h2>Analysis Results</h2>
+          <textarea
+            id="job"
+            name="jobDescription"
+            placeholder="Paste the job description here..."
+            value={jobDescription}
+            onChange={(e) => setJobDescription(e.target.value)}
+            maxLength={10000}
+            rows={12}
+            required
+            aria-describedby="job-count"
+          />
 
-            <div className="score-card">
-              <span>Estimated job match</span>
-              <strong>{analysis.match_score}%</strong>
+          <small id="job-count">
+            {jobDescription.length.toLocaleString()}/10,000 characters
+          </small>
+        </section>
+
+        <button
+          className="analyze-button"
+          type="submit"
+          disabled={loading}
+        >
+          {loading
+            ? "Analyzing your resume..."
+            : "Analyze My Resume"}
+        </button>
+      </form>
+
+      {error && (
+        <div className="error" role="alert">
+          {error}
+        </div>
+      )}
+
+      {analysis && (
+        <section
+          className="results"
+          aria-labelledby="results-heading"
+          aria-live="polite"
+        >
+          <h2 id="results-heading">
+            Your Analysis Results
+          </h2>
+
+          <div className="score-card">
+            <span>Estimated Job Match</span>
+
+            <strong>{safeScore}%</strong>
+
+            <div
+              className="progress"
+              role="progressbar"
+              aria-valuenow={safeScore}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label="Estimated job match"
+            >
               <div
-                className="progress"
-                role="progressbar"
-                aria-valuenow={analysis.match_score}
-                aria-valuemin="0"
-                aria-valuemax="100"
-                aria-label="Estimated job match"
-              >
-                <div
-                  className="progress-fill"
-                  style={{ width: `${analysis.match_score}%` }}
-                />
-              </div>
-            </div>
-
-            <div className="result-grid">
-              <ResultList
-                title="Matching Skills"
-                items={analysis.matching_skills}
-              />
-              <ResultList
-                title="Missing or Unverified Skills"
-                items={analysis.missing_skills}
-              />
-              <ResultList title="Resume Strengths" items={analysis.strengths} />
-              <ResultList
-                title="Improvement Suggestions"
-                items={analysis.suggestions}
+                className="progress-fill"
+                style={{ width: `${safeScore}%` }}
               />
             </div>
+          </div>
 
-            <p className="disclaimer">
-              Disclaimer: This Resume Analyzer is an independent demo project
-              developed by Sourabh Chalke. It is designed for educational and
-              portfolio purposes to demonstrate my skills in React.js, Node.js,
-              Express.js, MongoDB, and Google Gemini AI integration. Resumes and
-              personal information provided by users are used solely for
-              generating AI-based analysis. AI-generated results are estimates
-              and do not represent actual hiring decisions. Users should verify
-              all generated recommendations for accuracy.
-            </p>
-          </section>
-        )}
-      </main>
-    </>
+          <div className="result-grid">
+            <ResultList
+              className="matching-skills"
+              title="Matching Skills"
+              items={analysis.matching_skills}
+            />
+
+            <ResultList
+              title="Missing or Unverified Skills"
+              items={analysis.missing_skills}
+            />
+
+            <ResultList
+              title="Resume Strengths"
+              items={analysis.strengths}
+            />
+
+            <ResultList
+              title="Improvement Suggestions"
+              items={analysis.suggestions}
+            />
+          </div>
+
+          <p className="disclaimer">
+            Disclaimer: This Resume Analyzer is an independent
+            demonstration project developed by Sourabh Chalke for
+            educational and portfolio purposes. It demonstrates
+            React.js, Node.js, Express.js, MongoDB, and Google Gemini
+            AI integration. Resume text and job descriptions are sent
+            to the configured AI service to generate the analysis.
+            Avoid submitting sensitive personal information.
+            Data handling and retention depend on the application's
+            backend and the configured service. AI-generated scores
+            and recommendations are estimates, not hiring decisions
+            or guarantees of employment. Please verify all findings
+            before using them in job applications.
+          </p>
+        </section>
+      )}
+    </main>
   );
 }
 
-function ResultList({ title, items }) {
+function ResultList({ title, items, className = "" }) {
+  const safeItems = Array.isArray(items)
+    ? items.filter(
+        (item) => typeof item === "string" && item.trim()
+      )
+    : [];
+
   return (
-    <article className="result-card">
+    <article className={`result-card ${className}`.trim()}>
       <h3>{title}</h3>
 
-      {items ? (
+      {safeItems.length > 0 ? (
         <ul>
-          {items.map((item, index) => (
-            <li key={`${item}-${index}`}>{item}</li>
+          {safeItems.map((item, index) => (
+            <li key={`${item}-${index}`}>
+              {item}
+            </li>
           ))}
         </ul>
       ) : (
-        <p>No items returned.</p>
+        <p>No items returned for this section.</p>
       )}
     </article>
   );
