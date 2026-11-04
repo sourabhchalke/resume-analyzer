@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import resumeRoutes from "./routes/resumeRoutes.js";
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ app.get("/", (req, res) => {
     message: "AI Resume Analyzer Backend is running"
   });
 });
+
+app.use("/api/resume", resumeRoutes);
 
 const PORT = process.env.PORT || 5000;
 
